@@ -4,7 +4,7 @@
   "description": "A React component that generates form based on a json input",
   "scripts": {
     "build:lib": "babel -d lib/ src/",
-    "postinstall": "build:lib"
+    "postinstall": "npm run build:lib"
   },
   "main": "lib/index.js",
   "author": "Golak Sarangi<golak.sarangi@gmail.com>",
