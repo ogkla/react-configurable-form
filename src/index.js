@@ -231,7 +231,7 @@ class ReactForm extends React.Component {
       return this.generateElementHtml(elementName);
     });
     return (
-      <div class={this.props.formConfig.className}>
+      <div className={this.props.formConfig.className}>
         <form onSubmit={this.formSubmit}>
           <ul>
             {formElements}
