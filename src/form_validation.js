@@ -1,6 +1,6 @@
 class FormValidation {
   static email (value) {
-    var regex = new RegExp('^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$', 'i');
+    var regex = new RegExp('^\\S+@\\S+\\.\\S+$', 'i');
     return regex.test(value);
   }
 
