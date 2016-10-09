@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "A React component that generates form based on a json input",
   "scripts": {
-    "build:lib": "babel -d lib/ src/",
+    "build:lib": "mkdir -p lib; babel -d lib/ src/",
     "postinstall": "npm run build:lib"
   },
   "main": "lib/index.js",
