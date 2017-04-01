@@ -95,7 +95,7 @@ class ReactForm extends React.Component {
       condBool = FormConditional.check(conf.condition, param =>
         this.state.elementsConf[param].value, elementName);
       if (condBool) {
-        attributes = _.assign(attributes, conf.conditionalAttributes);
+        attributes = _.assign({}, attributes, conf.conditionalAttributes);
       }
     }
     return attributes;
@@ -104,10 +104,7 @@ class ReactForm extends React.Component {
   _generateRadioBoxHtml(elementName, conf, elementId, attrSpread) {
     const radios = _.map(conf.options, (optionLabel, optionKey) => {
       const valueId = `${optionKey}_${elementId}`;
-      let checked;
-      if (conf.value === optionKey) {
-        checked = 'checked';
-      }
+      const checked = (conf.value === optionKey);
       return (
         <div {...attrSpread} key={valueId}>
           <input
