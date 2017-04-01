@@ -4,7 +4,6 @@
   "description": "A React component that generates form based on a json input",
   "scripts": {
     "build:lib": "./node_modules/.bin/babel src --out-dir lib",
-    "postinstall": "npm run build:lib",
     "lint": "node_modules/.bin/eslint ."
   },
   "main": "lib/index.js",
