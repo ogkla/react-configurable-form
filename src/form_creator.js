@@ -217,16 +217,24 @@ class ReactForm extends React.Component {
       </li>
     );
   }
-
-  componentWillMount() {
+  constructElementsConf(nextProps) {
     const elementsConf = {};
-    _.each(this.props.formConfig.order, (elementName) => {
-      const conf = this.props.formConfig.elements[elementName];
+    const props = nextProps || this.props;
+    _.each(props.formConfig.order, (elementName) => {
+      const conf = props.formConfig.elements[elementName];
       conf.value = conf.value !== undefined ? conf.value : '';
       elementsConf[elementName] = _.assign({}, conf);
     });
 
     this.setState({ elementsConf });
+  }
+
+  componentWillMount() {
+    this.constructElementsConf();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.constructElementsConf(nextProps);
   }
 
   render() {
