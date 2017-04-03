@@ -4,7 +4,7 @@ const FormConditional = require('./form_conditional');
 const _ = require('lodash');
 
 
-class ReactForm extends React.Component {
+class ReactForm extends React.PureComponent {
   constructor() {
     super();
     this._formSubmit = this._formSubmit.bind(this);
@@ -156,6 +156,14 @@ class ReactForm extends React.Component {
       />
     );
   }
+  _generateCompositeElement(elementName, conf, elementId, attrSpread) {
+    const comboHtml = _.map(conf.children, childName => this._generateElementHtml(childName));
+    return (
+      <ul name={elementName} {...attrSpread} id={elementId}>
+        {comboHtml}
+      </ul>
+    );
+  }
   _generateElementHtml(elementName) {
     const attrSpread = {};
     const conf = this.state.elementsConf[elementName];
@@ -205,6 +213,9 @@ class ReactForm extends React.Component {
       case 'select':
         elementHtml = this._generateSelectHtml(elementName, conf, elementId, attrSpread);
         break;
+      case 'composite':
+        elementHtml = this._generateCompositeElement(elementName, conf, elementId, attrSpread);
+        break;
       default:
         elementHtml = this._generateInputHtml(elementName, conf, elementId, attrSpread);
     }
@@ -220,8 +231,7 @@ class ReactForm extends React.Component {
   constructElementsConf(nextProps) {
     const elementsConf = {};
     const props = nextProps || this.props;
-    _.each(props.formConfig.order, (elementName) => {
-      const conf = props.formConfig.elements[elementName];
+    _.each(props.formConfig.elements, (conf, elementName) => {
       conf.value = conf.value !== undefined ? conf.value : '';
       elementsConf[elementName] = _.assign({}, conf);
     });
