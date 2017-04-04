@@ -17,18 +17,28 @@ class ReactForm extends React.PureComponent {
     e.preventDefault();
     const response = {};
     _.each(this.props.formConfig.order, (elementName) => {
-      const attr = this._getAttributes(elementName);
-      if (attr.dontShow) {
-        return;
-      }
-      const output = this._performValidation(elementName);
-      response[elementName] = {};
-      response[elementName].value = this.state.elementsConf[elementName].value;
-      if (!_.every(output.validationErrors, (hasError => !hasError))) {
-        response[elementName].validationErrors = output.validationErrors;
-      }
+      this._createResponseObject(elementName, response);
     });
     this.props.formConfig.action.submit(e, response);
+  }
+
+  _createResponseObject(elementName, response) {
+    const attr = this._getAttributes(elementName);
+    if (attr.dontShow) {
+      return;
+    }
+    if (this.state.elementsConf[elementName].type === 'composite') {
+      _.each(this.state.elementsConf[elementName].children, (child) => {
+        this._createResponseObject(child, response);
+      });
+      return;
+    }
+    const output = this._performValidation(elementName);
+    response[elementName] = {};
+    response[elementName].value = this.state.elementsConf[elementName].value;
+    if (!_.every(output.validationErrors, (hasError => !hasError))) {
+      response[elementName].validationErrors = output.validationErrors;
+    }
   }
 
   _handleChange(elementName, e) {
@@ -143,6 +153,9 @@ class ReactForm extends React.PureComponent {
   }
 
   _generateInputHtml(elementName, conf, elementId, attrSpread) {
+    if (conf.type === 'checkbox') {
+      attrSpread.checked = conf.value;
+    }
     return (
       <input
         type={conf.type}
@@ -243,8 +256,16 @@ class ReactForm extends React.PureComponent {
     this.constructElementsConf();
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.constructElementsConf(nextProps);
+  componentWillReceiveProps(props) {
+    const elementsConf = {};
+    _.each(props.formConfig.elements, (conf, elementName) => {
+      if (this.state.elementsConf[elementName]) {
+        conf.value = this.state.elementsConf[elementName].value;
+      }
+      elementsConf[elementName] = _.assign({}, conf);
+    });
+
+    this.setState({ elementsConf });
   }
 
   render() {
