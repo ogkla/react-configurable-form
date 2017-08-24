@@ -4,7 +4,8 @@
   "description": "A React component that generates form based on a json input",
   "scripts": {
     "build:lib": "./node_modules/.bin/babel src --out-dir lib",
-    "lint": "node_modules/.bin/eslint ."
+    "lint": "node_modules/.bin/eslint .",
+    "lintfix": "node_modules/.bin/eslint . --fix"
   },
   "main": "lib/index.js",
   "author": "Golak Sarangi<golak.sarangi@gmail.com>",
