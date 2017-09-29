@@ -10,6 +10,7 @@ class ReactForm extends React.PureComponent {
     this._formSubmit = this._formSubmit.bind(this);
     this.state = {
       elementsConf: {},
+      validForm: true,
     };
   }
 
@@ -53,6 +54,9 @@ class ReactForm extends React.PureComponent {
       if (elemConf[elementName].type === 'radio' || elemConf[elementName].type === 'select') {
         this.props.formConfig.action.validation(this._performValidation(elementName));
       }
+    }
+    if (this.props.formConfig.disableSubmitWhenUnValidated) {
+      this._validatedForm();
     }
   }
 
@@ -177,6 +181,20 @@ class ReactForm extends React.PureComponent {
       </ul>
     );
   }
+
+  _validatedForm() {
+    const response = {};
+    _.each(this.props.formConfig.order, (elementName) => {
+      this._createResponseObject(elementName, response);
+    });
+    const isValid = _.isEmpty(_.find(response, (respObj) => {
+      const validationErrors = _.get(respObj, 'validationErrors', []);
+      return !!(_.find(validationErrors, r => r));
+    }));
+    this.setState({
+      validForm: isValid,
+    });
+  }
   _generateElementHtml(elementName) {
     const attrSpread = {};
     const conf = this.state.elementsConf[elementName];
@@ -188,6 +206,13 @@ class ReactForm extends React.PureComponent {
     let suffixLabel = '';
     let elementId = conf.id;
     let elementHtml;
+    if (conf.type === 'submit' && this.props.formConfig.disableSubmitWhenUnValidated) {
+      if (this.state.validForm) {
+        delete attr.disabled;
+      } else {
+        attr.disabled = 'disabled';
+      }
+    }
 
     /* eslint-disable no-restricted-syntax, no-prototype-builtins */
     for (const key in attr) {
@@ -255,6 +280,11 @@ class ReactForm extends React.PureComponent {
   componentWillMount() {
     this.constructElementsConf();
   }
+  componentDidMount() {
+    if (this.props.formConfig.disableSubmitWhenUnValidated) {
+      this._validatedForm();
+    }
+  }
 
   componentWillReceiveProps(props) {
     const elementsConf = {};
@@ -264,6 +294,7 @@ class ReactForm extends React.PureComponent {
       }
       elementsConf[elementName] = _.assign({}, conf);
     });
+
 
     this.setState({ elementsConf });
   }
