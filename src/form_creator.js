@@ -97,6 +97,15 @@ class ReactForm extends React.PureComponent {
     if (['checkbox', 'radio', 'select'].indexOf(this.state.elementsConf[elementName].type) !== -1) {
       return;
     }
+
+    let eachElemConf = this.state.elementsConf[elementName];
+    if (eachElemConf.modifyFunc && typeof eachElemConf.modifyFunc === 'function') {
+      const elemConf = _.assign({}, this.state.elementsConf);
+      eachElemConf = elemConf[elementName];
+      eachElemConf.value = eachElemConf.modifyFunc(eachElemConf.value);
+      this.setState({ elementsConf: elemConf });
+    }
+
     this.props.formConfig.action.validation(this._performValidation(elementName));
   }
 
