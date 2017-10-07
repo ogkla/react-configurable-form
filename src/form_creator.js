@@ -296,16 +296,9 @@ class ReactForm extends React.PureComponent {
   }
 
   componentWillReceiveProps(props) {
-    const elementsConf = {};
-    _.each(props.formConfig.elements, (conf, elementName) => {
-      if (this.state.elementsConf[elementName]) {
-        conf.value = this.state.elementsConf[elementName].value;
-      }
-      elementsConf[elementName] = _.assign({}, conf);
-    });
-
-
-    this.setState({ elementsConf });
+    if (this.props.formConfig !== props.formConfig) {
+      this.constructElementsConf(props);
+    }
   }
 
   render() {
