@@ -279,7 +279,12 @@ class ReactForm extends React.PureComponent {
     const elementsConf = {};
     const props = nextProps || this.props;
     _.each(props.formConfig.elements, (conf, elementName) => {
-      conf.value = conf.value !== undefined ? conf.value : '';
+      const stateValue = _.get(this.state, ['elementsConf', elementName, 'value']);
+      if (!_.isUndefined(stateValue)) {
+        conf.value = stateValue;
+      } else {
+        conf.value = conf.value !== undefined ? conf.value : '';
+      }
       elementsConf[elementName] = _.assign({}, conf);
     });
 

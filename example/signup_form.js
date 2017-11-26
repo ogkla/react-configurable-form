@@ -1,7 +1,4 @@
 const React = require('react');
-const Col = require('../grid/col.js');
-const Row = require('../grid/row.js');
-const Container = require('../grid/container.js');
 const ReactForm = require('react-configurable-form');
 
 class SignupForm extends React.Component {
