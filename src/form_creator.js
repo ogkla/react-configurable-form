@@ -14,6 +14,10 @@ class ReactForm extends React.PureComponent {
     };
   }
 
+  static _isDevEnv() {
+    return _.get(process, 'env.NODE_ENV') === 'development';
+  }
+
   _formSubmit(e) {
     e.preventDefault();
     const response = {};
@@ -279,12 +283,7 @@ class ReactForm extends React.PureComponent {
     const elementsConf = {};
     const props = nextProps || this.props;
     _.each(props.formConfig.elements, (conf, elementName) => {
-      const stateValue = _.get(this.state, ['elementsConf', elementName, 'value']);
-      if (!_.isUndefined(stateValue)) {
-        conf.value = stateValue;
-      } else {
-        conf.value = conf.value !== undefined ? conf.value : '';
-      }
+      conf.value = conf.value !== undefined ? conf.value : '';
       elementsConf[elementName] = _.assign({}, conf);
     });
 
@@ -301,12 +300,15 @@ class ReactForm extends React.PureComponent {
   }
 
   componentWillReceiveProps(props) {
-    if (this.props.formConfig !== props.formConfig) {
+    if (this.props.formKey !== props.formKey) {
       this.constructElementsConf(props);
     }
   }
 
   render() {
+    if (!this.props.formKey && this.constructor._isDevEnv) {
+      console.error('React configurable form requires a formKey.');
+    }
     const formElements = _.map(this.props.formConfig.order,
       elementName => this._generateElementHtml(elementName));
     return (
