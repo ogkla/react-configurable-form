@@ -53,9 +53,15 @@ class ReactForm extends React.PureComponent {
       this.setState({ elementsConf: elemConf });
       this.props.formConfig.action.validation(this._performValidation(elementName));
     } else {
-      elemConf[elementName].value = e.target.value;
+      if (typeof e === 'object') {
+        elemConf[elementName].value = e.target.value;
+      } else {
+        elemConf[elementName].value = e;
+      }
       this.setState({ elementsConf: elemConf });
-      if (elemConf[elementName].type === 'radio' || elemConf[elementName].type === 'select') {
+      if (elemConf[elementName].type === 'radio'
+        || elemConf[elementName].type === 'select'
+        || elemConf[elementName].type === 'custom') {
         this.props.formConfig.action.validation(this._performValidation(elementName));
       }
     }
@@ -94,6 +100,7 @@ class ReactForm extends React.PureComponent {
         }
       });
     }
+    output.value = _.get(this.state.elementsConf, [elementName, 'value']);
     return output;
   }
 
@@ -208,6 +215,32 @@ class ReactForm extends React.PureComponent {
       validForm: isValid,
     });
   }
+
+  _changeCustomElement(elementName, value) {
+    this._handleChange(elementName, value);
+  }
+  _generateCustomElement(elementName, conf, elementId, attrSpread) {
+    const FieldComponent = conf.fieldComponent;
+    const props = { ...conf.props } || {};
+    props.value = this.state.elementsConf[elementName].value;
+    props.elementName = elementName;
+    props.onChange = this._changeCustomElement.bind(this, elementName);
+    return (
+      <div name={elementName} {...attrSpread} id={elementId}>
+        <FieldComponent {...props} />
+      </div>
+    );
+  }
+  static _generateSubNote(subnote) {
+    if (subnote) {
+      return (
+        <div className="subnote">
+          {subnote}
+        </div>
+      );
+    }
+    return null;
+  }
   _generateElementHtml(elementName) {
     const attrSpread = {};
     const conf = this.state.elementsConf[elementName];
@@ -226,6 +259,7 @@ class ReactForm extends React.PureComponent {
         attr.disabled = 'disabled';
       }
     }
+    let subnoteHtml = null;
 
     /* eslint-disable no-restricted-syntax, no-prototype-builtins */
     for (const key in attr) {
@@ -233,6 +267,9 @@ class ReactForm extends React.PureComponent {
         switch (key) {
           case 'dontShow':
             return null;
+          case 'subnote':
+            subnoteHtml = this.constructor._generateSubNote(attr.subnote);
+            break;
           case 'wrapperClassName':
             wrapperClassName = attr.wrapperClassName;
             break;
@@ -267,15 +304,20 @@ class ReactForm extends React.PureComponent {
       case 'composite':
         elementHtml = this._generateCompositeElement(elementName, conf, elementId, attrSpread);
         break;
+      case 'custom':
+        elementHtml = this._generateCustomElement(elementName, conf, elementId, attrSpread);
+        break;
       default:
         elementHtml = this._generateInputHtml(elementName, conf, elementId, attrSpread);
     }
+
 
     return (
       <li key={elementName} className={wrapperClassName}>
         {prefixLabel}
         {elementHtml}
         {suffixLabel}
+        {subnoteHtml}
       </li>
     );
   }
