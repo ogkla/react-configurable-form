@@ -221,7 +221,7 @@ class ReactForm extends React.PureComponent {
   }
   _generateCustomElement(elementName, conf, elementId, attrSpread) {
     const FieldComponent = conf.fieldComponent;
-    const props = { ...conf.props } || {};
+    const props = Object.assign({}, conf.props);
     props.value = this.state.elementsConf[elementName].value;
     props.elementName = elementName;
     props.onChange = this._changeCustomElement.bind(this, elementName);
